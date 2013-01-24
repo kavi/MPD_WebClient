@@ -1,10 +1,11 @@
 from flask import Flask, render_template, redirect, url_for
-import getopt
-import query
 import socket
 import sys
 import os
+import ConfigParser
+import getopt
 import signal
+import query
 
 SELF_IP='192.168.1.10'
 SELF_PORT='5000'
@@ -28,12 +29,12 @@ def default():
 def command(cmd):
     print "Command: " + cmd
     print  query.mpd_query(cmd)
-    return redirect('http://192.168.1.10:5000/mpd/')
+    return redirect(SELF_URL)
 
 @app.route('/command/<cmd>/<arg>', methods=['POST'])
 def command_arg(cmd, arg):
     query.mpd_query(cmd, arg)
-    return redirect('http://192.168.1.10:5000/mpd/')
+    return redirect(SELF_URL)
 
 
 def make_pid(pidfile):
@@ -55,13 +56,25 @@ def usage():
 
 if __name__ == '__main__':
     PID = None
-    optlist, args = getopt.getopt(sys.argv[1:], 'p:', ['pidfile='])
+    CONF_FILE = '/etc/mpd_wc/server.conf'
+    optlist, args = getopt.getopt(sys.argv[1:], 'p:', ['pidfile=', 'config='])
     for opt,arg in optlist:
         if "--pidfile" == opt:
             PID=arg
+        elif "--config" == opt:
+            CONF_FILE=arg
     if PID is None:
         usage()
         sys.exit(1)
+
+    config = ConfigParser.ConfigParser()
+    config.readfp(open(CONF_FILE))
+    SELF_IP = config.get('WebServer','WEBSERVICE_IP')
+    SELF_PORT = config.get('WebServer','WEBSERVICE_PORT')
+    SELF_URL='http://' + SELF_IP + ':' + SELF_PORT + '/mpd/'
+    MPD_IP = config.get('MPDServer','MPDSERVER_IP')
+    MPD_PORT = config.get('MPDServer','MPDSERVER_PORT')
+
     signal.signal(signal.SIGINT, signal_handler)
     make_pid(pidfile=PID)
     app.debug = False
