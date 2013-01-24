@@ -5,15 +5,17 @@ source ${CONF_FILE}
 
 SERVICE="MPD WebClient"
 ARGS="start ${CONF_FILE}"
-VENV_BIN=${FLASK_HOME}/venv/bin
 
-do_start() {
-  start-stop-daemon -b --start --user $USER --group $GROUP --chuid $USER --exec "${SERVICE_BIN}" ${ARGS}
-#  [ -f ${PIDFILE} ] && echo "MPD WebClient started."
+do_start() { 
+  start-stop-daemon -T --pidfile ${PIDFILE} && { echo "${SERVICE} already running." ; exit 1 ; }
+  echo "Starting ${SERVICE}"
+  start-stop-daemon -b --start --user $USER --group $GROUP --chuid $USER --exec "${SERVICE_BIN}" ${ARGS} || echo "Failed to start"
+  [ -f ${PIDFILE} ] && echo "MPD WebClient started." 
 }
 
 do_stop() {
-  start-stop-daemon -K --pidfile ${PIDFILE}
+  echo "Stopping ${SERVICE}"
+  start-stop-daemon -K --pidfile ${PIDFILE} 
   rm ${PIDFILE}
 }
 
@@ -30,8 +32,8 @@ case "$1" in
         [ -f ${PIDFILE} ] && echo "Running" || echo "Not running"
         ;;
   restart|reload|condrestart)
-        stop
-        start
+        do_stop
+        do_start
         ;;
   *)
         echo $"Usage: $0 {start|stop|restart|reload|status}"

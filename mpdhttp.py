@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for
+import traceback
 import socket
 import sys
 import os
@@ -6,40 +7,45 @@ import ConfigParser
 import getopt
 import signal
 import query
-
-SELF_IP='192.168.1.10'
-SELF_PORT='5000'
-
-MPD_IP='192.168.1.10'
-MPD_PORT=6600
+import serverconf
 
 app = Flask(__name__)
+conf = None
+mpdQuery = query.Query()
 
-@app.route('/mpd/') 
+
+def run():
+    app.debug = False
+    app.run(host='0.0.0.0')
+
+@app.route('/mpd/')
 def default():
-    currentsong = query.get_currentsong()
-    playlist = query.get_currentplaylist()
-    return render_template('mpd.html', 
-           currentsong=currentsong,
-           currentsong_lengthm=currentsong.length / 60,
-           currentsong_lengths=currentsong.length % 60,
-           playlist=playlist)
+    try:
+        currentsong = mpdQuery.get_currentsong()
+        playlist = mpdQuery.get_currentplaylist()
+        return render_template('mpd.html',
+               currentsong=currentsong,
+               currentsong_lengthm=currentsong.length / 60,
+               currentsong_lengths=currentsong.length % 60,
+               playlist=playlist)
+    except:
+        traceback.print_exc()
 
 @app.route('/command/<cmd>', methods=['POST'])
 def command(cmd):
     print "Command: " + cmd
-    print  query.mpd_query(cmd)
-    return redirect(SELF_URL)
+    print  mpdQuery.mpd_query(cmd)
+    return redirect(conf.url)
 
 @app.route('/command/<cmd>/<arg>', methods=['POST'])
 def command_arg(cmd, arg):
-    query.mpd_query(cmd, arg)
-    return redirect(SELF_URL)
+    mpdQuery.mpd_query(cmd, arg)
+    return redirect(conf.url)
 
 
 def make_pid(pidfile):
     pid = str(os.getpid())
- 
+
     if os.path.isfile(pidfile):
         print "%s already exists, exiting" % pidfile
         sys.exit(1)
@@ -48,11 +54,11 @@ def make_pid(pidfile):
 
 def signal_handler(signal, frame):
     if os.path.isfile(PID):
-      os.remove(PID)
+        os.remove(PID)
     sys.exit(0)
 
 def usage():
-    print "Usage: --pidfile=<pidfile>"
+    print "Usage: --pidfile=<pidfile> [--config=<config-file>]"
 
 if __name__ == '__main__':
     PID = None
@@ -77,5 +83,9 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGINT, signal_handler)
     make_pid(pidfile=PID)
-    app.debug = False
-    app.run(host='0.0.0.0')
+    conf = serverconf.Config()
+    conf.ip = SELF_IP
+    conf.port = SELF_PORT
+    mpdQuery.mpd_ip = MPD_IP
+    mpdQuery.mpd_port = int(MPD_PORT)
+    run()
