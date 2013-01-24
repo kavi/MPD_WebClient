@@ -1,5 +1,4 @@
 from flask import Flask, render_template, redirect, url_for
-import logging
 import getopt
 import query
 import socket
@@ -7,16 +6,19 @@ import sys
 import os
 import signal
 
+SELF_IP='192.168.1.10'
+SELF_PORT='5000'
+
 MPD_IP='192.168.1.10'
 MPD_PORT=6600
 
 app = Flask(__name__)
 
 @app.route('/mpd/') 
-def hello_world():
+def default():
     currentsong = query.get_currentsong()
     playlist = query.get_currentplaylist()
-    return render_template('hello.html', 
+    return render_template('mpd.html', 
            currentsong=currentsong,
            currentsong_lengthm=currentsong.length / 60,
            currentsong_lengths=currentsong.length % 60,
