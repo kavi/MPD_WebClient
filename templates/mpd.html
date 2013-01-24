@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<title>
+{% if currentsong.title %}
+Mpd Now Playing - {{ currentsong.title|safe }}
+{% else %}
+Mpd
+{% endif %}
+</title>
+</head>
+<body>
+{% if currentsong.title %}
+  <table><tr><th>Title</th><th>Artist</th><th>Album</th><th>Track</th><th>Length</th></tr>
+  <tr><td>{{ currentsong.title|safe }}</td>
+<td>{{ currentsong.artist|safe }}</td>
+<td>{{ currentsong.album|safe }}</td>
+<td>{{ currentsong.track|safe }}</td>
+<td>{{ currentsong_lengthm }}:{{ currentsong_lengths }}</td>
+</tr>
+</table>
+{% else %}
+  <p>None</p>
+{% endif %}
+
+  <form action="http://192.168.1.10:5000/command/previous" method="POST">
+    <button id="btn_previous" type="button" onclick="submit()">&lt;&lt;</button>
+  </form> 
+  <form action="http://192.168.1.10:5000/command/pause" method="POST">
+    <!--input type="button" value="Play" name="play" onclick="submit()"/-->
+    <button id="btn_play" type="button" onclick="submit()">Play</button>
+  </form> 
+  <form action="http://192.168.1.10:5000/command/next" method="POST">
+    <button id="btn_next" type="button" onclick="submit()">&gt;&gt;</button>
+  </form> 
+
+<table>
+{% for song in playlist %}
+ <tr>
+  <td>
+   <form action="http://192.168.1.10:5000/command/play/{{ song.pos }}" method="POST">
+    <button id="btn_play_{{ song.pos }}" type="button" onclick="submit()">{{ song.pos }}</button>
+   </form>
+  </td>
+  <td>{{ song.title|safe }}</td><td>{{ song.artist|safe }}</td><td>{{ song.album|safe }}</td>
+  <td>
+   {{ song.length // 60 }}:{{ song.length % 60 }}
+  </td>
+ </tr>
+{% endfor %}
+</table>
+</body>
+</html>

@@ -1,0 +1,40 @@
+#!/bin/bash
+#CONF_FILE=/etc/mpd_wc/mpd_wc.conf
+CONF_FILE=/home/kavi/projects/flask/mpdhttp/debian/etc/mpd_wc.conf
+source ${CONF_FILE}
+
+SERVICE="MPD WebClient"
+ARGS="start ${CONF_FILE}"
+VENV_BIN=${FLASK_HOME}/venv/bin
+
+do_start() {
+  start-stop-daemon -b --start --user $USER --group $GROUP --chuid $USER --exec "${SERVICE_BIN}" ${ARGS}
+#  [ -f ${PIDFILE} ] && echo "MPD WebClient started."
+}
+
+do_stop() {
+  start-stop-daemon -K --pidfile ${PIDFILE}
+  rm ${PIDFILE}
+}
+
+### main logic ###
+case "$1" in
+  start)
+        do_start
+        ;;
+  stop)
+        do_stop
+        ;;
+  status)
+        # TODO - check if process is actually running or if it's just a dangling pidfile.
+        [ -f ${PIDFILE} ] && echo "Running" || echo "Not running"
+        ;;
+  restart|reload|condrestart)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+exit 0
