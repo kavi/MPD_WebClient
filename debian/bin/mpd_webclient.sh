@@ -1,10 +1,10 @@
 #!/bin/bash
-SERVICE="MPD WebClient"
 DEFAULT_CONF=/etc/mpd_wc.conf
 CONF_FILE=${2:-$DEFAULT_CONF}
-
 do_start() {
   source ${CONF_FILE}
+  echo "Pid: ${PIDFILE}"
+  echo "ServerConf: ${SERVERCONF}"
   VENV_BIN=${FLASK_HOME}/venv/bin
   WC_HOME=${FLASK_HOME}/mpdhttp
   . ${VENV_BIN}/activate

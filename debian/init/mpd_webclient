@@ -1,19 +1,20 @@
 #!/bin/bash
 #CONF_FILE=/etc/mpd_wc/mpd_wc.conf
-CONF_FILE=/home/kavi/projects/flask/mpdhttp/debian/etc/mpd_wc.conf
+CONF_FILE=debian/etc/mpd_wc.conf
 source ${CONF_FILE}
 
 SERVICE="MPD WebClient"
 ARGS="start ${CONF_FILE}"
 
 do_start() { 
-  start-stop-daemon -T --pidfile ${PIDFILE} && { echo "${SERVICE} already running." ; exit 1 ; }
+  start-stop-daemon -T --pidfile ${PIDFILE} && { echo "${SERVICE} already running." ; return 1 ; }
   echo "Starting ${SERVICE}"
-  start-stop-daemon -b --start --user $USER --group $GROUP --chuid $USER --exec "${SERVICE_BIN}" ${ARGS} || echo "Failed to start"
-  [ -f ${PIDFILE} ] && echo "MPD WebClient started." 
+  [ -d ${PIDFOLDER} ] || { mkdir -p "${PIDFOLDER}" ; chown "${USER}:${GROUP}" "${PIDFOLDER}" ; }
+  start-stop-daemon -b --start --user $USER --group $GROUP --chuid $USER --exec "${SERVICE_BIN}" ${ARGS}
 }
 
 do_stop() {
+  start-stop-daemon -T --pidfile ${PIDFILE} || { echo "${SERVICE} not running." ; return 1 ; }
   echo "Stopping ${SERVICE}"
   start-stop-daemon -K --pidfile ${PIDFILE} 
   rm ${PIDFILE}
@@ -23,9 +24,11 @@ do_stop() {
 case "$1" in
   start)
         do_start
+	exit $?
         ;;
   stop)
         do_stop
+	exit $?
         ;;
   status)
         # TODO - check if process is actually running or if it's just a dangling pidfile.
@@ -34,6 +37,7 @@ case "$1" in
   restart|reload|condrestart)
         do_stop
         do_start
+	exit $?
         ;;
   *)
         echo $"Usage: $0 {start|stop|restart|reload|status}"

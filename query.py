@@ -12,7 +12,7 @@ class Query:
         self.mpd_port = None
         self.mpd_ip = None
 
-    def get_currentplaylist(self):
+    def get_currentplaylist(self, pos=-1):
         str_play = self.mpd_query('playlistinfo')
         songs = []
         for line in str_play.split('\n'):
@@ -22,6 +22,11 @@ class Query:
                 songs.append(model.MpdSong())
             else:
                 self.set_songproperty(songs[len(songs) - 1], v)
+        for sng in songs:
+           if sng.pos == pos:
+             sng.playing = True
+           else:
+             sng.playing = False         
         return songs
 
     def set_songproperty(self, sng, v):
@@ -47,6 +52,21 @@ class Query:
             sng.pos = value
 #    else:
 #       print v[0]+ ":" + v[1] + " - not supported"
+
+    def get_all_songs(self):
+        str_all_songs = self.mpd_query('listallinfo')
+        songs = []
+        for line in str_all_songs.split('\n'):
+            if line.strip():
+                v = line.strip().split(':')
+            if v[0] == 'file':
+                songs.append(model.MpdSong())
+            elif v[0] == 'directory':
+                #Do nothing
+                continue
+            else:
+                self.set_songproperty(songs[len(songs) - 1], v)
+        return songs
 
 
     def get_currentsong(self):
@@ -108,7 +128,7 @@ def recv_timeout(the_socket,finish=is_done,timeout=1):
     total_data=[];data='';begin=time.time()
     done=0
     while 1:
-            #if you got some data, then break after wait sec
+        #if you got some data, then break after wait sec
         if total_data and time.time()-begin>timeout:
             break
         #if done

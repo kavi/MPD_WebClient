@@ -16,11 +16,12 @@ class MpdSong:
         self.artist = ''
         self.album = ''
         self.trackno = 0
+        self.elapsed = 0
         self.length = 0
         self.pos = -1
 
     def __str__(self):
-        return "[pos=" + str(self.pos) + ", title=" + self.title + ", Artist=" + self.artist + ", Album=" + self.album + ", Track=" + str(self.trackno) + ", length=" + str(self.length) + "]"
+        return "[pos=" + str(self.pos) + ", title=" + self.title + ", Artist=" + self.artist + ", Album=" + self.album + ", Track=" + str(self.trackno) + ", length=" + str(self.length) + ", elapsed=" + str(elapsed) + "]"
 
     def __repr__(self):
         return __str__(self)

@@ -8,45 +8,75 @@ Mpd Now Playing - {{ currentsong.title|safe }}
 Mpd
 {% endif %}
 </title>
+<style>
+  tr:nth-child(odd)    { background-color:#e4e4e4; }
+  tr:nth-child(even)    { background-color:#ffffff; }
+  tr.playing:nth-child(even) { background-color : #d4ffd4 ; }
+  tr.playing:nth-child(odd) { background-color : #d4e4d4 ; }
+</style>
+<script type="text/javascript" src="{{ url_for('static', filename='mpd.js') }}">
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery-1.9.1.min.js') }}">
+</script>
 </head>
-<body>
+<body onload="on_load()">
+<button id="btn_1" onclick="my_ajax()">Test</button>
 {% if currentsong.title %}
-  <table><tr><th>Title</th><th>Artist</th><th>Album</th><th>Track</th><th>Length</th></tr>
-  <tr><td>{{ currentsong.title|safe }}</td>
+  <input type="hidden" id="elapsed_initial" value="{{ currentsong.elapsed|safe }}"/>
+  <input type="hidden" id="current_song" value="{{ currentsong.pos|safe }}"/>
+  <table><tr><th>Title</th><th>Artist</th><th>Album</th><th>Track</th><th>Elapsed</td><th>Length</th></tr>
+  <tr><td id="current_title">{{ currentsong.title|safe }}</td>
 <td>{{ currentsong.artist|safe }}</td>
 <td>{{ currentsong.album|safe }}</td>
 <td>{{ currentsong.track|safe }}</td>
-<td>{{ currentsong_lengthm }}:{{ currentsong_lengths }}</td>
+<td id="elapsed">{{ currentsong.elapsed|safe }}</td>
+<td id="length">{{ currentsong_lengthm }}:{% if currentsong_lengths < 10 %}0{{ currentsong_lengths }}{% else %}{{ currentsong_lengths }}{% endif %}</td>
 </tr>
 </table>
 {% else %}
   <p>None</p>
 {% endif %}
 
-  <form action="http://192.168.1.10:5000/command/previous" method="POST">
-    <button id="btn_previous" type="button" onclick="submit()">&lt;&lt;</button>
-  </form> 
-  <form action="http://192.168.1.10:5000/command/pause" method="POST">
-    <!--input type="button" value="Play" name="play" onclick="submit()"/-->
-    <button id="btn_play" type="button" onclick="submit()">Play</button>
-  </form> 
-  <form action="http://192.168.1.10:5000/command/next" method="POST">
-    <button id="btn_next" type="button" onclick="submit()">&gt;&gt;</button>
-  </form> 
+  <button id="btn_previous" onclick="previous()">&lt;&lt;</button>
+  <button id="btn_play" onclick="play()">Play</button>
+  <button id="btn_next" onclick="next()">&gt;&gt;</button>
 
 <table>
 {% for song in playlist %}
- <tr>
+ {% if song.playing %}
+ <tr class="playing" id="playlist_row_{{ song.pos }}">
+ {% else %}
+ <tr class="playlist" id="playlist_row_{{ song.pos }}">
+ {% endif %}
   <td>
-   <form action="http://192.168.1.10:5000/command/play/{{ song.pos }}" method="POST">
-    <button id="btn_play_{{ song.pos }}" type="button" onclick="submit()">{{ song.pos }}</button>
-   </form>
+   <button id="btn_play_{{ song.pos }}" onclick="my_post('/command/play/{{ song.pos }}')">{{ song.pos }}</button>
   </td>
-  <td>{{ song.title|safe }}</td><td>{{ song.artist|safe }}</td><td>{{ song.album|safe }}</td>
+  <td id="title_{{ song.pos }}">
+  {{ song.title|safe }}</td><td>{{ song.artist|safe }}</td><td>{{ song.album|safe }}</td>
+  <input type="hidden" id="song_length_{{ song.pos }}" value="{{ song.length|safe }}">
   <td>
+   {% if song.length % 60 < 10 %}
+   {{ song.length // 60 }}:0{{ song.length % 60 }}
+   {% else %}
    {{ song.length // 60 }}:{{ song.length % 60 }}
+   {% endif %}
   </td>
  </tr>
+{% endfor %}
+</table>
+<p id="demo"></p>
+<table>
+{% for song in allsongs %}
+  <tr class="allsongs">
+    <td>{{ song.title|safe }}</td><td>{{ song.artist|safe }}</td><td>{{ song.album|safe }}</td>
+    <td>
+    {% if song.length % 60 < 10 %}
+     {{ song.length // 60 }}:0{{ song.length % 60 }}
+    {% else %}
+     {{ song.length // 60 }}:{{ song.length % 60 }}
+    {% endif %}
+   </td>
+  </tr>
 {% endfor %}
 </table>
 </body>
