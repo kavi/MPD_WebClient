@@ -22,8 +22,6 @@ Mpd
 <body onload="on_load()">
 <button id="btn_1" onclick="my_ajax()">Test</button>
 {% if currentsong.title %}
-  <input type="hidden" id="elapsed_initial" value="{{ currentsong.elapsed|safe }}"/>
-  <input type="hidden" id="current_song" value="{{ currentsong.pos|safe }}"/>
   <table><tr><th>Title</th><th>Artist</th><th>Album</th><th>Track</th><th>Elapsed</td><th>Length</th></tr>
   <tr><td id="current_title">{{ currentsong.title|safe }}</td>
 <td id="current_artist">{{ currentsong.artist|safe }}</td>
@@ -53,7 +51,6 @@ Mpd
   </td>
   <td id="title_{{ song.pos }}">
   {{ song.title|safe }}</td><td>{{ song.artist|safe }}</td><td>{{ song.album|safe }}</td>
-  <input type="hidden" id="song_length_{{ song.pos }}" value="{{ song.length|safe }}">
   <td>
    {% if song.length % 60 < 10 %}
    {{ song.length // 60 }}:0{{ song.length % 60 }}
