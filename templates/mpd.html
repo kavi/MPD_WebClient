@@ -26,9 +26,9 @@ Mpd
   <input type="hidden" id="current_song" value="{{ currentsong.pos|safe }}"/>
   <table><tr><th>Title</th><th>Artist</th><th>Album</th><th>Track</th><th>Elapsed</td><th>Length</th></tr>
   <tr><td id="current_title">{{ currentsong.title|safe }}</td>
-<td>{{ currentsong.artist|safe }}</td>
-<td>{{ currentsong.album|safe }}</td>
-<td>{{ currentsong.track|safe }}</td>
+<td id="current_artist">{{ currentsong.artist|safe }}</td>
+<td id="current_album">{{ currentsong.album|safe }}</td>
+<td id="current_track">{{ currentsong.track|safe }}</td>
 <td id="elapsed">{{ currentsong.elapsed|safe }}</td>
 <td id="length">{{ currentsong_lengthm }}:{% if currentsong_lengths < 10 %}0{{ currentsong_lengths }}{% else %}{{ currentsong_lengths }}{% endif %}</td>
 </tr>
