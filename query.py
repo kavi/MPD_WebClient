@@ -20,6 +20,7 @@ class Query:
                 v = line.strip().split(':')
             if v[0] == 'file':
                 songs.append(model.MpdSong())
+                self.set_songproperty(songs[len(songs) - 1], v)
             else:
                 self.set_songproperty(songs[len(songs) - 1], v)
         for sng in songs:
@@ -50,6 +51,8 @@ class Query:
             sng.date = value
         elif v[0] == 'Pos':
             sng.pos = value
+        elif v[0] == 'file':
+            sng.file = value
 #    else:
 #       print v[0]+ ":" + v[1] + " - not supported"
 
@@ -61,6 +64,7 @@ class Query:
                 v = line.strip().split(':')
             if v[0] == 'file':
                 songs.append(model.MpdSong())
+                self.set_songproperty(songs[len(songs) - 1], v)
             elif v[0] == 'directory':
                 #Do nothing
                 continue

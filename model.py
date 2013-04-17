@@ -1,3 +1,5 @@
+import json
+
 class MpdStatus:
     def __init__(self):
         self.volume = 0
@@ -21,10 +23,10 @@ class MpdSong:
         self.pos = -1
 
     def __str__(self):
-        return "[pos=" + str(self.pos) + ", title=" + self.title + ", Artist=" + self.artist + ", Album=" + self.album + ", Track=" + str(self.trackno) + ", length=" + str(self.length) + ", elapsed=" + str(elapsed) + "]"
+        return "[pos=" + str(self.pos) + ", title=" + self.title + ", Artist=" + self.artist + ", Album=" + self.album + ", Track=" + str(self.trackno) + ", length=" + str(self.length) + ", elapsed=" + str(self.elapsed) + "]"
 
     def __repr__(self):
-        return __str__(self)
+        return "MpdSong"
 
 if __name__ == '__main__':
     s = MpdSong()

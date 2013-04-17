@@ -30,7 +30,7 @@ def default():
     logger.debug("Querying mpd for playlist.")
     currentsong = mpdQuery.get_currentsong()
     playlist = mpdQuery.get_currentplaylist(currentsong.pos)
-    allsongs = mpdQuery.get_all_songs()
+#    allsongs = mpdQuery.get_all_songs()
     status = mpdQuery.get_status()
     currentsong.elapsed = status.elapsed
     return render_template('mpd.html',
@@ -38,8 +38,8 @@ def default():
                            currentsong=currentsong,
                            currentsong_lengthm=currentsong.length / 60,
                            currentsong_lengths=currentsong.length % 60,
-                           playlist=playlist,
-                           allsongs=allsongs)
+                           playlist=playlist)
+#                           allsongs=allsongs)
 
 @app.route('/currentsong', methods=['GET'])
 def get_currentsong():
@@ -50,6 +50,15 @@ def get_currentsong():
     currentsong.state = status.state
     return json.dumps(currentsong.__dict__)
 
+@app.route('/collection', methods=['GET'])
+def get_collection():
+    logger.debug("Get Collection");
+    collection = mpdQuery.get_all_songs()
+    col = []
+    for c in collection:
+        col.append(c.__dict__)
+    return json.dumps(col)
+
 @app.route('/command/<cmd>', methods=['POST'])
 def command(cmd):
     logger.debug("Command: " + cmd)
@@ -59,6 +68,7 @@ def command(cmd):
 
 @app.route('/command/<cmd>/<arg>', methods=['POST'])
 def command_arg(cmd, arg):
+    logger.debug("Command: " + cmd + ", arg: " + arg)
     r=mpdQuery.mpd_query(cmd, arg)
     return json.dumps(r);
 

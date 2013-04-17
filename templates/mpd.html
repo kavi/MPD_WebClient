@@ -19,8 +19,8 @@ Mpd
 <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.9.1.min.js') }}">
 </script>
 </head>
-<body onload="on_load()">
-<button id="btn_1" onclick="my_ajax()">Test</button>
+<body onload="MPD.on_load()">
+<!--button id="btn_1" onclick="my_ajax()">Test</button-->
 {% if currentsong.title %}
   <table><tr><th>Title</th><th>Artist</th><th>Album</th><th>Track</th><th>Elapsed</td><th>Length</th></tr>
   <tr><td id="current_title">{{ currentsong.title|safe }}</td>
@@ -35,6 +35,7 @@ Mpd
   <p>None</p>
 {% endif %}
 
+  <button id="btn_test" onclick="my_post('/command/add/00_Mixed')">Test!</button>
   <button id="btn_previous" onclick="previous()">&lt;&lt;</button>
   <button id="btn_play" onclick="play()">Play</button>
   <button id="btn_next" onclick="next()">&gt;&gt;</button>
@@ -62,7 +63,8 @@ Mpd
 {% endfor %}
 </table>
 <p id="demo"></p>
-<table>
+<div id="collection"></div>
+<!--table>
 {% for song in allsongs %}
   <tr class="allsongs">
     <td>{{ song.title|safe }}</td><td>{{ song.artist|safe }}</td><td>{{ song.album|safe }}</td>
@@ -75,6 +77,6 @@ Mpd
    </td>
   </tr>
 {% endfor %}
-</table>
+</table-->
 </body>
 </html>
