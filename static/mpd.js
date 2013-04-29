@@ -14,7 +14,7 @@ MPD.get_currentsong = function() {
     }
     $.get("/currentsong",function(data,status) {
 	MPD.data_currentsong=JSON.parse(data);
-	set_current_song();
+	MPD.set_current_song();
     });
 }
 
@@ -62,7 +62,7 @@ MPD.update = function() {
 //    t=setTimeout(function(){MPD.update()},1000);
 }
 
-function set_current_song() {
+MPD.set_current_song = function() {
     document.getElementById("playlist_row_" + MPD.prevsong).setAttribute("class", "playlist");
     document.getElementById("playlist_row_" + MPD.data_currentsong.pos).setAttribute("class", "playing");
     var title=MPD.data_currentsong.title;
@@ -80,8 +80,7 @@ function set_time(element, t) {
     document.getElementById(element).innerHTML=m+":"+s;
 }
 
-function zero_pad(i)
-{
+function zero_pad(i) {
     if (i<10)
     {
 	i="0" + i;
